@@ -1,4 +1,5 @@
 "use client";
+// Import necessary modules
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { firestore } from "@/firebase";
@@ -9,6 +10,10 @@ import {
   TextField,
   Typography,
   Button,
+  Card,
+  CardContent,
+  CardActions,
+  Grid,
 } from "@mui/material";
 import {
   collection,
@@ -18,13 +23,13 @@ import {
   query,
   getDoc,
   setDoc,
-  setItemName,
 } from "firebase/firestore";
 
 export default function Home() {
   const [inventory, setinventory] = useState([]);
   const [open, setOpen] = useState(false);
   const [itemName, setItemName] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const updateInventory = async () => {
     const snapshot = query(collection(firestore, "inventory"));
@@ -76,17 +81,83 @@ export default function Home() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+  const filteredInventory = inventory.filter((item) =>
+    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <Box
       width="100vw"
-      height="100vh"
+      minHeight="100vh"
       display="flex"
       flexDirection="column"
-      justifyContent="center"
+      justifyContent="flex-start"
       alignItems="center"
-      gap={2}
+      gap={3}
+      padding={3}
+      className="bg-animated-gradient" // Apply the animated background class
     >
-      <Modal open={open} onclose={handleClose}>
+      <Typography variant="h2" color="#333333" marginBottom={2}>
+        Pantry Inventory
+      </Typography>
+
+      <TextField
+        variant="outlined"
+        placeholder="Search items"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        fullWidth
+        sx={{ maxWidth: 600, marginBottom: 3 }}
+      />
+
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleOpen}
+        sx={{ marginBottom: 3 }}
+      >
+        Add New Item
+      </Button>
+
+      <Grid container spacing={3} justifyContent="center">
+        {filteredInventory.map(({ name, quantity }) => (
+          <Grid item xs={12} sm={6} md={4} lg={3} key={name}>
+            <Card sx={{ minWidth: 275, bgcolor: getRandomColor() }}>
+              <CardContent>
+                <Typography
+                  variant="h5"
+                  component="div"
+                  color="#333333"
+                  gutterBottom
+                >
+                  {name.charAt(0).toUpperCase() + name.slice(1)}
+                </Typography>
+                <Typography variant="body2" color="#333333">
+                  Quantity: {quantity}
+                </Typography>
+              </CardContent>
+              <CardActions>
+                <Button
+                  size="small"
+                  color="primary"
+                  onClick={() => addItem(name)}
+                >
+                  Add
+                </Button>
+                <Button
+                  size="small"
+                  color="secondary"
+                  onClick={() => removeItem(name)}
+                >
+                  Remove
+                </Button>
+              </CardActions>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+
+      <Modal open={open} onClose={handleClose}>
         <Box
           position="absolute"
           top="50%"
@@ -126,68 +197,23 @@ export default function Home() {
           </Stack>
         </Box>
       </Modal>
-      <Button
-        variant="contained"
-        onClick={() => {
-          handleOpen();
-        }}
-      >
-        Add New Item
-      </Button>
-      <Box border="1px solid #333">
-        <Box
-          width="800px"
-          height="100px"
-          bgcolor="#ADD8E6"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <Typography variant="h2" color="#333">
-            Inventory Items
-          </Typography>
-        </Box>
-        <Stack width="800px" height="300px" spacing={2} overflow="auto">
-          {inventory.map(({ name, quantity }) => (
-            <Box
-              key={name}
-              width="100%"
-              minHeight="150px"
-              display="flex"
-              alignItems="center"
-              justifyContent="space-between" // Aligns items to the start of the box
-              bgcolor="#f0f0f0"
-              padding={5}
-            >
-              <Typography variant="h3" color="#333">
-                {name.charAt(0).toUpperCase() + name.slice(1)}
-              </Typography>
-              <Typography variant="h3" color="#333">
-                {quantity}
-              </Typography>
-              <Stack direction="row" spacing={2}>
-                <Button
-                  variant="contained"
-                  onClick={() => {
-                    addItem(name);
-                  }}
-                >
-                  Add
-                </Button>
-
-                <Button
-                  variant="contained"
-                  onClick={() => {
-                    removeItem(name);
-                  }}
-                >
-                  Remove
-                </Button>
-              </Stack>
-            </Box>
-          ))}
-        </Stack>
-      </Box>
     </Box>
   );
 }
+
+// Helper function to get a random color
+const getRandomColor = () => {
+  const colors = [
+    "#FFB6C1", // Light Pink
+    "#FFDEAD", // Navajo White
+    "#FFE4B5", // Moccasin
+    "#98FB98", // Pale Green
+    "#87CEFA", // Light Sky Blue
+    "#D8BFD8", // Thistle
+    "#E6E6FA", // Lavender
+    "#F5F5DC", // Beige
+  ];
+  return colors[Math.floor(Math.random() * colors.length)];
+};
+
+

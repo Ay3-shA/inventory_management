@@ -1,3 +1,48 @@
+/* globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.bg-animated-gradient {
+  background: linear-gradient(270deg, #ff7e5f, #feb47b, #86a8e7, #91eae4);
+  background-size: 800% 800%;
+  animation: gradientAnimation 15s ease infinite;
+}
+
+.card-bg-red {
+  background-color: #ff6f6f; /* Light red */
+}
+
+.card-bg-yellow {
+  background-color: #f4c542; /* Light yellow */
+}
+
+.card-bg-green {
+  background-color: #4caf50; /* Light green */
+}
+
+.card-bg-blue {
+  background-color: #2196f3; /* Light blue */
+}
+
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
 * {
   box-sizing: border-box;
   padding: 0;
